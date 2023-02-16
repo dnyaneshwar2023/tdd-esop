@@ -26,6 +26,15 @@ class STTServiceTest {
                 Arguments.of(540, 3, 20)
             )
         }
+
+        @JvmStatic
+        fun getOrderQuantitiesMoreThan50k(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of(50_001, 100, 75002),
+                Arguments.of(100_000, 100_000, 150000000),
+                Arguments.of(54_000, 3, 2430)
+            )
+        }
     }
 
     @ParameterizedTest
@@ -48,5 +57,13 @@ class STTServiceTest {
         assertEquals(expectedTax, STTService().computeTax(quantity, price))
     }
 
-
+    @ParameterizedTest
+    @MethodSource("getOrderQuantitiesMoreThan50k")
+    fun `It should calculate fee for sell order given order quantity is more than 50k`(
+        quantity: Long,
+        price: Long,
+        expectedTax: Long
+    ) {
+        assertEquals(expectedTax, STTService().computeTax(quantity, price))
+    }
 }

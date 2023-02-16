@@ -70,7 +70,8 @@ class STTServiceTest {
     @ParameterizedTest
     @MethodSource("getOrderQuantitiesUpto100")
     fun `It should calculate fee for sell order given order quantity is upto 100`(
-        esopType: String, quantity: Long,
+        esopType: String,
+        quantity: Long,
         price: Long,
         expectedTax: Long
     ) {
@@ -80,7 +81,8 @@ class STTServiceTest {
     @ParameterizedTest
     @MethodSource("getOrderQuantitiesMoreThan100LessThan50k")
     fun `It should calculate fee for sell order given order quantity in range 101-50k`(
-        esopType: String, quantity: Long,
+        esopType: String,
+        quantity: Long,
         price: Long,
         expectedTax: Long
     ) {
@@ -90,7 +92,8 @@ class STTServiceTest {
     @ParameterizedTest
     @MethodSource("getOrderQuantitiesMoreThan50k")
     fun `It should calculate fee for sell order given order quantity is more than 50k`(
-        esopType: String, quantity: Long,
+        esopType: String,
+        quantity: Long,
         price: Long,
         expectedTax: Long
     ) {
@@ -101,7 +104,8 @@ class STTServiceTest {
     @ParameterizedTest
     @MethodSource("getPerformanceOrderQuantitiesUpto100")
     fun `It should calculate fee for performance sell order given order quantity is upto 100`(
-        esopType: String, quantity: Long,
+        esopType: String,
+        quantity: Long,
         price: Long,
         expectedTax: Long
     ) {
@@ -111,7 +115,8 @@ class STTServiceTest {
     @ParameterizedTest
     @MethodSource("getPerformanceOrderQuantitiesMoreThan100LessThan50k")
     fun `It should calculate fee for performance sell order given order quantity in range 101-50k`(
-        esopType: String, quantity: Long,
+        esopType: String,
+        quantity: Long,
         price: Long,
         expectedTax: Long
     ) {
@@ -121,7 +126,8 @@ class STTServiceTest {
     @ParameterizedTest
     @MethodSource("getPerformanceOrderQuantitiesMoreThan50k")
     fun `It should calculate fee for performance sell order given order quantity is more than 50k`(
-        esopType: String, quantity: Long,
+        esopType: String,
+        quantity: Long,
         price: Long,
         expectedTax: Long
     ) {
@@ -132,6 +138,7 @@ class STTServiceTest {
     fun `It should throw exception given quantity is negative`() {
         assertThrows(IllegalArgumentException::class.java) { STTService().computeTax("NON_PERFORMANCE", -10, 20) }
     }
+
     @Test
     fun `It should throw exception given price is negative`() {
         assertThrows(IllegalArgumentException::class.java) { STTService().computeTax("NON_PERFORMANCE", 10, -20) }
@@ -144,7 +151,13 @@ class STTServiceTest {
 
     @Test
     fun `It should throw exception if price multiplied quantity overflows`() {
-        assertThrows(TotalValueOverflowException::class.java) { STTService().computeTax("PERFORMANCE", 10_000_000_00_000, 190_000_000_000_000) }
+        assertThrows(TotalValueOverflowException::class.java) {
+            STTService().computeTax(
+                "PERFORMANCE",
+                10_000_000_00_000,
+                190_000_000_000_000
+            )
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.esop.service
 
+import com.esop.repository.STTRepository
 import com.esop.repository.UserRecords
 import com.esop.schema.Order
 import com.esop.schema.User
@@ -11,11 +12,13 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.lang.Thread.sleep
+import java.math.BigInteger
 
 class OrderServiceTest {
 
-    private lateinit var userRecords:UserRecords
-    private lateinit var orderService:OrderService
+    private lateinit var userRecords: UserRecords
+    private lateinit var orderService: OrderService
+    private val sttService = STTService()
 
     @BeforeEach
     fun `It should create user`() {
@@ -81,7 +84,7 @@ class OrderServiceTest {
         //Assert
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(10, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
     }
 
@@ -109,17 +112,17 @@ class OrderServiceTest {
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(50, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
-        assertEquals("PARTIAL", buyOrders[buyOrders.indexOf(buyOrderBySankar)].orderStatus)
+        assertEquals("PARTIAL", buyOrderBySankar.orderStatus)
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
+            sellOrderByArun.orderStatus
         )
     }
 
@@ -147,20 +150,20 @@ class OrderServiceTest {
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
+            sellOrderByArun.orderStatus
         )
     }
 
@@ -187,11 +190,11 @@ class OrderServiceTest {
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "PARTIAL",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
     }
 
@@ -214,15 +217,15 @@ class OrderServiceTest {
         //Assert
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(10, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
         assertEquals(50, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "PARTIAL",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
     }
 
@@ -251,18 +254,18 @@ class OrderServiceTest {
         assertEquals(25, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(10, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(10, userRecords.getUser("aditya")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(196, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
-        assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
-        assertEquals("PARTIAL", sellOrders[sellOrders.indexOf(sellOrderByKajal)].orderStatus)
-        assertEquals(
-            "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+
+        val sttTax = sttService.computeTax(
+            sellOrderByKajal.esopType,
+            sellOrderByKajal.getQuantity(),
+            sellOrderByKajal.getPrice()
         )
-        assertEquals(
-            "COMPLETED",
-            userRecords.getUser("aditya")!!.orderList[userRecords.getUser("aditya")!!.orderList.indexOf(buyOrderByAditya)].orderStatus
-        )
+        assertEquals(2, sttTax)
+        assertEquals(194, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
+        assertEquals("PARTIAL", sellOrderByKajal.orderStatus)
+        assertEquals("COMPLETED", buyOrderBySankar.orderStatus)
+        assertEquals("COMPLETED", buyOrderByAditya.orderStatus)
     }
 
     @Test
@@ -293,19 +296,18 @@ class OrderServiceTest {
         assertEquals(0, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
 
         assertEquals(10, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98 + 98, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
+        assertEquals(194, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
 
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(sellOrderBySankar)].orderStatus
+            sellOrderBySankar.orderStatus
+        )
+        assertEquals(
+            "COMPLETED", buyOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(buyOrderByKajal)].orderStatus
-        )
-        assertEquals(
-            "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(buyOrderByArun)].orderStatus
+            buyOrderByArun.orderStatus
         )
     }
 
@@ -328,7 +330,7 @@ class OrderServiceTest {
         //Assert
         assertEquals(40, userRecords.getUser("kajal")!!.userPerformanceInventory.getFreeInventory())
         assertEquals(10, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(100, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
     }
 
@@ -351,7 +353,7 @@ class OrderServiceTest {
         //Assert
         assertEquals(40, userRecords.getUser("kajal")!!.userPerformanceInventory.getFreeInventory())
         assertEquals(10, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(100, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
     }
 
@@ -373,7 +375,7 @@ class OrderServiceTest {
         //Assert
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(10, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getFreeMoney())
     }
 
@@ -387,7 +389,7 @@ class OrderServiceTest {
 
         userRecords.getUser("arun")!!.userPerformanceInventory.addESOPsToInventory(50)
         val sellOrderByArun = Order(10, "SELL", 10, "arun")
-        sellOrderByArun.esopType="PERFORMANCE"
+        sellOrderByArun.esopType = "PERFORMANCE"
         userRecords.getUser("arun")!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(10)
         orderService.placeOrder(sellOrderByArun)
 
@@ -402,20 +404,20 @@ class OrderServiceTest {
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userPerformanceInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(100, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
+            sellOrderByArun.orderStatus
         )
     }
 
@@ -424,13 +426,13 @@ class OrderServiceTest {
         //Arrange
         userRecords.getUser("kajal")!!.userPerformanceInventory.addESOPsToInventory(50)
         val sellOrderByKajal = Order(10, "SELL", 10, "kajal")
-        sellOrderByKajal.esopType="PERFORMANCE"
+        sellOrderByKajal.esopType = "PERFORMANCE"
         userRecords.getUser("kajal")!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(10)
         orderService.placeOrder(sellOrderByKajal)
 
         userRecords.getUser("arun")!!.userPerformanceInventory.addESOPsToInventory(50)
         val sellOrderByArun = Order(10, "SELL", 10, "arun")
-        sellOrderByArun.esopType="PERFORMANCE"
+        sellOrderByArun.esopType = "PERFORMANCE"
         userRecords.getUser("arun")!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(10)
         orderService.placeOrder(sellOrderByArun)
 
@@ -445,20 +447,20 @@ class OrderServiceTest {
         assertEquals(40, userRecords.getUser("kajal")!!.userPerformanceInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userPerformanceInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(100, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(100, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
+            sellOrderByArun.orderStatus
         )
     }
 
@@ -467,13 +469,13 @@ class OrderServiceTest {
         //Arrange
         userRecords.getUser("kajal")!!.userPerformanceInventory.addESOPsToInventory(50)
         val sellOrderByKajal = Order(10, "SELL", 10, "kajal")
-        sellOrderByKajal.esopType="PERFORMANCE"
+        sellOrderByKajal.esopType = "PERFORMANCE"
         userRecords.getUser("kajal")!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(10)
 
         sleep(10)
         userRecords.getUser("arun")!!.userPerformanceInventory.addESOPsToInventory(50)
         val sellOrderByArun = Order(10, "SELL", 10, "arun")
-        sellOrderByArun.esopType="PERFORMANCE"
+        sellOrderByArun.esopType = "PERFORMANCE"
         userRecords.getUser("arun")!!.userPerformanceInventory.moveESOPsFromFreeToLockedState(10)
         orderService.placeOrder(sellOrderByArun)
         orderService.placeOrder(sellOrderByKajal)
@@ -489,20 +491,20 @@ class OrderServiceTest {
         assertEquals(40, userRecords.getUser("kajal")!!.userPerformanceInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userPerformanceInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(100, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(100, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
+            sellOrderByArun.orderStatus
         )
     }
 
@@ -531,20 +533,20 @@ class OrderServiceTest {
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(98, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
+            sellOrderByArun.orderStatus
         )
     }
 
@@ -554,40 +556,41 @@ class OrderServiceTest {
         userRecords.getUser("kajal")!!.userNonPerfInventory.addESOPsToInventory(50)
         val sellOrderByKajal = Order(10, "SELL", 20, "kajal")
         userRecords.getUser("kajal")!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
-        orderService.placeOrder(sellOrderByKajal)
 
         userRecords.getUser("arun")!!.userNonPerfInventory.addESOPsToInventory(50)
         val sellOrderByArun = Order(10, "SELL", 10, "arun")
         userRecords.getUser("arun")!!.userNonPerfInventory.moveESOPsFromFreeToLockedState(10)
-        orderService.placeOrder(sellOrderByArun)
-
 
         userRecords.getUser("sankar")!!.userWallet.addMoneyToWallet(400)
         val buyOrderBySankar = Order(20, "BUY", 20, "sankar")
         userRecords.getUser("sankar")!!.userWallet.moveMoneyFromFreeToLockedState(400)
 
+        val sttForKajal = sttService.computeTax(
+            sellOrderByKajal.esopType,
+            sellOrderByKajal.getQuantity(),
+            sellOrderByKajal.getPrice()
+        )
+        val sttForArun =
+            sttService.computeTax(sellOrderByArun.esopType, sellOrderByArun.getQuantity(), sellOrderByArun.getPrice())
+
         //Act
+        orderService.placeOrder(sellOrderByKajal)
+        orderService.placeOrder(sellOrderByArun)
         orderService.placeOrder(buyOrderBySankar)
 
         //Assert
+        assertEquals(2, sttForKajal)
+        assertEquals(1, sttForArun)
+        assertEquals(BigInteger.valueOf(3), STTRepository.getTax())
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(196, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(196 - sttForKajal, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(98 - sttForArun, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
-        assertEquals(
-            "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
-        )
-        assertEquals(
-            "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
-        )
-        assertEquals(
-            "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
-        )
+        assertEquals("COMPLETED", buyOrderBySankar.orderStatus)
+        assertEquals("COMPLETED", sellOrderByKajal.orderStatus)
+        assertEquals("COMPLETED", sellOrderByArun.orderStatus)
     }
 
     @Test
@@ -614,20 +617,20 @@ class OrderServiceTest {
         assertEquals(40, userRecords.getUser("kajal")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(40, userRecords.getUser("arun")!!.userNonPerfInventory.getFreeInventory())
         assertEquals(20, userRecords.getUser("sankar")!!.userNonPerfInventory.getFreeInventory())
-        assertEquals(196, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
-        assertEquals(98, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
+        assertEquals(194, userRecords.getUser("kajal")!!.userWallet.getFreeMoney())
+        assertEquals(97, userRecords.getUser("arun")!!.userWallet.getFreeMoney())
         assertEquals(0, userRecords.getUser("sankar")!!.userWallet.getLockedMoney())
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("sankar")!!.orderList[userRecords.getUser("sankar")!!.orderList.indexOf(buyOrderBySankar)].orderStatus
+            buyOrderBySankar.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("kajal")!!.orderList[userRecords.getUser("kajal")!!.orderList.indexOf(sellOrderByKajal)].orderStatus
+            sellOrderByKajal.orderStatus
         )
         assertEquals(
             "COMPLETED",
-            userRecords.getUser("arun")!!.orderList[userRecords.getUser("arun")!!.orderList.indexOf(sellOrderByArun)].orderStatus
+            sellOrderByArun.orderStatus
         )
     }
 }

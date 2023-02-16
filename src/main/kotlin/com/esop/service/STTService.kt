@@ -7,19 +7,7 @@ import kotlin.math.round
 
 class STTService {
     fun computeTax(esopType: String, quantity: Long, price: Long): Long {
-
-        if (quantity < 0 || price < 0) {
-            throw IllegalArgumentException("Quantity or Price cannot be negative")
-        }
-
-        if (esopType != "PERFORMANCE" && esopType != "NON_PERFORMANCE") {
-            throw IllegalArgumentException("Esop type is not valid. Valid Types: PERFORMANCE, NON_PERFORMANCE")
-        }
-
-        if(quantity > Long.MAX_VALUE/price) {
-            throw TotalValueOverflowException("Overflow in total value of price * quantity")
-        }
-
+        validateArguments(quantity, price, esopType)
         return if (esopType == "NON_PERFORMANCE") {
             when {
                 quantity <= 100 -> min(round(quantity * price * 0.01).toLong(), 20)
@@ -35,5 +23,17 @@ class STTService {
         }
     }
 
+    private fun validateArguments(quantity: Long, price: Long, esopType: String) {
+        if (quantity < 0 || price < 0) {
+            throw IllegalArgumentException("Quantity or Price cannot be negative")
+        }
 
+        if (esopType != "PERFORMANCE" && esopType != "NON_PERFORMANCE") {
+            throw IllegalArgumentException("Esop type is not valid. Valid Types: PERFORMANCE, NON_PERFORMANCE")
+        }
+
+        if (quantity > Long.MAX_VALUE / price) {
+            throw TotalValueOverflowException("Overflow in total value of price * quantity")
+        }
+    }
 }

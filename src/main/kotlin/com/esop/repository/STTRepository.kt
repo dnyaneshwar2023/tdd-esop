@@ -11,4 +11,7 @@ object STTRepository {
     }
 
     fun getTax(): BigInteger = sttTax
+    fun resetTax() {
+        sttTax = BigInteger.ZERO
+    }
 }

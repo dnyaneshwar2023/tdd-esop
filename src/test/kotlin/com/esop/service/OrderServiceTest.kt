@@ -24,6 +24,7 @@ class OrderServiceTest {
     fun `It should create user`() {
         userRecords = UserRecords()
         orderService = OrderService(userRecords)
+        STTRepository.resetTax()
 
         val buyer1 = User("Sankaranarayanan", "M", "7550276216", "sankaranarayananm@sahaj.ai", "sankar")
         val buyer2 = User("Aditya", "Tiwari", "", "aditya@sahaj.ai", "aditya")
